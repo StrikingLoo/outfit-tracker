@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Clothing Selector</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        select {
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 5px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        #savedSelections {
+            margin-top: 20px;
+            border-top: 1px solid #ccc;
+            padding-top: 10px;
+        }
+        pre {
+            background-color: #f4f4f4;
+            padding: 10px;
+            border-radius: 5px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Clothing Selector</h1>
+    
+    <select id="outerwear">
+        <option value="">Select Outerwear (Optional)</option>
+    </select>
+    
+    <select id="top">
+        <option value="">Select Top (Optional)</option>
+    </select>
+    
+    <select id="shirt">
+        <option value="">Select Shirt (Optional)</option>
+    </select>
+    
+    <select id="pants">
+        <option value="">Select Pants (Optional)</option>
+    </select>
+    
+    <select id="shoes">
+        <option value="">Select Shoes (Optional)</option>
+    </select>
+    
+    <button onclick="saveSelection()">Save Selection</button>
+    
+    <div id="savedSelections">
+        <h2>Saved Selections</h2>
+        <pre id="savedList"></pre>
+        <button onclick="clearSelections()">Clear All Selections</button>
+    </div>
+
+    <script>
+        // Populate dropdowns when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Fetch clothing options
+            fetch('/api/clothing-options')
+                .then(response => response.json())
+                .then(data => {
+                    const categories = ['outerwear', 'top', 'shirt', 'pants', 'shoes'];
+                    categories.forEach(category => {
+                        const select = document.getElementById(category);
+                        data[category].forEach(item => {
+                            const option = document.createElement('option');
+                            option.value = item;
+                            option.textContent = item;
+                            select.appendChild(option);
+                        });
+                    });
+                })
+                .catch(error => console.error('Error loading clothing options:', error));
+            
+            // Load saved selections
+            loadSavedSelections();
+        });
+
+        function saveSelection() {
+            const selection = {
+                outerwear: document.getElementById('outerwear').value || null,
+                top: document.getElementById('top').value || null,
+                shirt: document.getElementById('shirt').value || null,
+                pants: document.getElementById('pants').value || null,
+                shoes: document.getElementById('shoes').value || null
+            };
+
+            // Send selection to server
+            fetch('/api/selections', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(selection)
+            })
+            .then(() => {
+                // Reload saved selections
+                loadSavedSelections();
+                // Reset dropdowns
+                document.querySelectorAll('select').forEach(select => select.selectedIndex = 0);
+            })
+            .catch(error => console.error('Error saving selection:', error));
+        }
+
+        function loadSavedSelections() {
+            fetch('/api/selections')
+                .then(response => response.json())
+                .then(savedSelections => {
+                    const savedList = document.getElementById('savedList');
+                    savedList.textContent = JSON.stringify(savedSelections, null, 2);
+                })
+                .catch(error => console.error('Error loading saved selections:', error));
+        }
+
+        function clearSelections() {
+            fetch('/api/selections', {
+                method: 'DELETE'
+            })
+            .then(() => {
+                loadSavedSelections();
+            })
+            .catch(error => console.error('Error clearing selections:', error));
+        }
+    </script>
+</body>
+</html>

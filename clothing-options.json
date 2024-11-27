@@ -1,0 +1,37 @@
+{
+    "outerwear": [
+        "Winter Coat", 
+        "Leather Jacket", 
+        "Denim Jacket", 
+        "Windbreaker", 
+        "Hoodie"
+    ],
+    "top": [
+        "Sweater", 
+        "Sweatshirt", 
+        "Cardigan", 
+        "Blazer", 
+        "Tank Top"
+    ],
+    "shirt": [
+        "T-Shirt", 
+        "Polo Shirt", 
+        "Button-Up", 
+        "Henley", 
+        "Long Sleeve Tee"
+    ],
+    "pants": [
+        "Jeans", 
+        "Chinos", 
+        "Cargo Pants", 
+        "Sweatpants", 
+        "Dress Pants"
+    ],
+    "shoes": [
+        "Sneakers", 
+        "Dress Shoes", 
+        "Boots", 
+        "Sandals", 
+        "Running Shoes"
+    ]
+}
