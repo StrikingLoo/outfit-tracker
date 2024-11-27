@@ -23,6 +23,11 @@ const ensureDataDirectory = async () => {
     }
 };
 
+// Default route to serve index.html
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
 // Read clothing options
 app.get('/api/clothing-options', async (req, res) => {
     try {
