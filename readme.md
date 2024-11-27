@@ -62,3 +62,5 @@ Exporting data is as easy as copying the `saved_selectins.json` file.
 - `index.html`: Frontend application
 - `data/clothing_options.json`: Predefined clothing options
 - `data/saved_selections.json`: Saved user selections
+
+This project was bootstrapped with Claude code. Feel free to use anything here, just credit me if possible (a link and mention are enough).
