@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Clothing Selection Filter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        #filter {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+        }
+        .entry {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #f9f9f9;
+        }
+        .entry-details {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .entry-details div {
+            flex: 1;
+            min-width: 150px;
+            border: 1px solid #ddd;
+            padding:4px;
+            border-radius: 4px;
+        }
+        .entry-timestamp {
+            color: #666;
+            font-size: 0.8em;
+            margin-top: 5px;
+        }
+        #count {
+            margin-bottom: 10px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <h1>Clothing Selection Filter</h1>
+    <input type="text" id="filter" placeholder="Filter by item name">
+    <div id="count"></div>
+    <div id="entries"></div>
+
+    <script>
+        // Load and manage clothing selections
+        class ClothingFilter {
+            constructor() {
+                this.selections = [];
+                this.filterInput = document.getElementById('filter');
+                this.entriesContainer = document.getElementById('entries');
+                this.countDisplay = document.getElementById('count');
+
+                this.filterInput.addEventListener('input', () => this.filterEntries());
+                this.loadSelections();
+            }
+
+            async loadSelections() {
+                try {
+                    const response = await fetch('/api/selections');
+                    this.selections = await response.json();
+                    this.renderEntries(this.selections);
+                } catch (error) {
+                    console.error('Error loading selections:', error);
+                }
+            }
+
+            filterEntries() {
+                const filterTerm = this.filterInput.value.toLowerCase();
+                
+                const filteredSelections = this.selections.filter(selection => 
+                    Object.values(selection).some(value => 
+                        value && value.toString().toLowerCase().includes(filterTerm)
+                    )
+                );
+
+                this.renderEntries(filteredSelections);
+            }
+
+            renderEntries(entries) {
+                // Update count
+                this.countDisplay.textContent = `${entries.length} / ${this.selections.length} entries`;
+
+                // Clear previous entries
+                this.entriesContainer.innerHTML = '';
+
+                // Render new entries
+                entries.forEach(selection => {
+                    const entryDiv = document.createElement('div');
+                    entryDiv.className = 'entry';
+
+                    const entryDetailsDiv = document.createElement('div');
+                    entryDetailsDiv.className = 'entry-details';
+
+                    // Sort keys alphabetically, excluding timestamp
+                    const sortedEntries = Object.entries(selection)
+                        .filter(([key]) => key !== 'timestamp')
+                        .sort(([a], [b]) => a.localeCompare(b));
+
+                    // Add non-empty clothing items in sorted order
+                    sortedEntries.forEach(([key, value]) => {
+                        if (value) {
+                            const itemDiv = document.createElement('div');
+                            itemDiv.textContent = `${key}: ${value}`;
+                            entryDetailsDiv.appendChild(itemDiv);
+                        }
+                    });
+
+                    // Add timestamp
+                    const timestampDiv = document.createElement('div');
+                    timestampDiv.className = 'entry-timestamp';
+                    timestampDiv.textContent = new Date(selection.timestamp).toLocaleString();
+
+                    entryDiv.appendChild(entryDetailsDiv);
+                    entryDiv.appendChild(timestampDiv);
+                    this.entriesContainer.appendChild(entryDiv);
+                });
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            new ClothingFilter();
+        });
+    </script>
+</body>
+</html>

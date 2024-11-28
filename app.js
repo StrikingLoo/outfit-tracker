@@ -28,6 +28,10 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
+app.get('/stats', (req, res) => {
+    res.sendFile(path.join(__dirname, 'clothing-filter.html'));
+});
+
 // Read clothing options
 app.get('/api/clothing-options', async (req, res) => {
     try {
